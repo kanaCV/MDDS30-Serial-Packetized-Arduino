@@ -1,0 +1,51 @@
+/* this code is from the mdds library meant for arduino family, we have extracted the basic code from it and modified it suitable for esp 32 */
+/* this is code is working for SmartDriveDuo-30 MDDS30 dual motor */
+/* the motor driver is in serial packetized mode */
+/* the switch is in 11100000*/
+/* pin connection 
+    MDDS - ESP 32
+    in1 - tx2 
+    gnd - gnd */
+
+uint8_t headerByte = 0x55, addressByte, commandByte, checksum;
+
+void setup()
+{
+  //Serial.begin(9600);
+  delay(2000);
+  Serial2.begin(115200);
+  delay(100);
+
+  Serial2.write(0x80);// the header bit for 
+  delay(2000);
+}
+
+void motorcontrol(uint8_t _boardId, signed int motorLSpeed, signed int motorRSpeed)
+{
+  addressByte = _boardId | 0b00000000;
+  commandByte = map(motorLSpeed, -100, 100, 0, 255);
+  checksum = (headerByte + addressByte + commandByte) % 256;
+        Serial2.write(headerByte);
+        Serial2.write(addressByte);
+        Serial2.write(commandByte);
+        Serial2.write(checksum);
+
+        //Serial.println(checksum);
+
+  addressByte = _boardId | 0b00001000;
+  commandByte = map(motorRSpeed, 100, -100, 0, 255);
+  checksum = (headerByte + addressByte + commandByte) % 256;
+        Serial2.write(headerByte);
+        Serial2.write(addressByte);
+        Serial2.write(commandByte);
+        Serial2.write(checksum);
+        //Serial.print(checksum); // uncomment this to know the check sum being sent 
+}
+
+void loop()
+{
+ motorcontrol(0, 50, 50);//boardid, left speed , right speed 
+ delay(1000);
+
+
+}
