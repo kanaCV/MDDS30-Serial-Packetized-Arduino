@@ -14,6 +14,7 @@
  */
 
 uint8_t headerByte = 0x55;     // Constant header byte as per protocol
+uint8_t startByte = 0x80;
 uint8_t addressByte, commandByte, checksum;
 
 /**
@@ -25,7 +26,7 @@ void setup()
   Serial2.begin(115200);  // UART2: TX2 on GPIO17
   delay(100);
 
-  Serial2.write(0x80);  // Send start byte to wake up MDDS30
+  Serial2.write(startByte);  // Send start byte to wake up MDDS30
   delay(2000);          // Allow time for MDDS30 to initialize
 }
 
